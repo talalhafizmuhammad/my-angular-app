@@ -1,0 +1,88 @@
+<div class="shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-icon">✦</span>
+      <span class="brand-name">TaskFlow</span>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item" [class.active]="filter() === 'all'" (click)="setFilter('all')">
+        <span class="nav-icon">◈</span> All Tasks
+        <span class="badge">{{ stats().total }}</span>
+      </button>
+      <button class="nav-item" [class.active]="filter() === 'active'" (click)="setFilter('active')">
+        <span class="nav-icon">◉</span> Active
+        <span class="badge">{{ stats().active }}</span>
+      </button>
+      <button class="nav-item" [class.active]="filter() === 'done'" (click)="setFilter('done')">
+        <span class="nav-icon">◎</span> Completed
+        <span class="badge">{{ stats().done }}</span>
+      </button>
+    </nav>
+
+    <div class="progress-block">
+      <div class="progress-label">
+        <span>Progress</span>
+        <span class="progress-pct">{{ stats().total ? ((stats().done / stats().total) * 100 | number:'1.0-0') : 0 }}%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill"
+          [style.width.%]="stats().total ? (stats().done / stats().total) * 100 : 0">
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1>{{ filter() === 'all' ? 'All Tasks' : filter() === 'active' ? 'Active' : 'Completed' }}</h1>
+        <p class="subtitle">{{ stats().active }} remaining · {{ stats().done }} done</p>
+      </div>
+      @if (stats().done > 0) {
+        <button class="btn-ghost" (click)="clearDone()">Clear completed</button>
+      }
+    </header>
+
+    <!-- Input -->
+    <div class="input-row">
+      <select class="priority-select" [(ngModel)]="newTaskPriority">
+        <option value="low">Low</option>
+        <option value="medium">Med</option>
+        <option value="high">High</option>
+      </select>
+      <input
+        class="task-input"
+        type="text"
+        placeholder="Add a new task…"
+        [(ngModel)]="newTaskTitle"
+        (keydown)="onEnter($event)"
+      />
+      <button class="btn-add" (click)="addTask()">Add</button>
+    </div>
+
+    <!-- Task List -->
+    <ul class="task-list">
+      @for (task of filteredTasks(); track task.id) {
+        <li class="task-card" [class.done]="task.done">
+          <button class="check" [class.checked]="task.done" (click)="toggleTask(task.id)" [attr.aria-label]="'Toggle ' + task.title">
+            @if (task.done) { ✓ }
+          </button>
+          <span class="task-title">{{ task.title }}</span>
+          <span class="pill" [attr.data-p]="task.priority">{{ task.priority }}</span>
+          <button class="del" (click)="deleteTask(task.id)" aria-label="Delete task">✕</button>
+        </li>
+      }
+      @if (filteredTasks().length === 0) {
+        <li class="empty">
+          <span class="empty-icon">◌</span>
+          <span>No tasks here</span>
+        </li>
+      }
+    </ul>
+  </main>
+
+</div>
