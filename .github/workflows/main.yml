@@ -1,4 +1,4 @@
-name: GitHub angular app CI
+name: GitHub Angular App CI
 
 on:
   push:
@@ -9,9 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6.0.3
+      - uses: actions/checkout@v4
+
       - name: Setup Node JS
-        uses: actions/setup-node@v6.4.0
+        uses: actions/setup-node@v4
         with:
           node-version: 22.x
 
@@ -19,9 +20,10 @@ jobs:
         run: npm install
 
       - name: Build Angular app
-        run: npm run build --prod
-      - name: Deploy to github pages
-        uses: peaceiris/actions-gh-pages@v3.8.0
+        run: npx ng build --configuration production --base-href /my-angular-app/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist/assignment-grader
+          publish_dir: ./dist/task-app/browser
